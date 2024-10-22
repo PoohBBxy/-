@@ -28,7 +28,6 @@
 │   ├── db_config.py          # 数据库配置
 └── main.py                  # 项目入口文件
 ```
-
 ## 项目简介
 
 本系统提供以下功能：
@@ -73,61 +72,115 @@ def get_connection():
     )
 ```
 
-### 数据库表结构
-
 在 MySQL 数据库中，创建以下表：
 
 ```sql
+-- 创建数据库
 CREATE DATABASE academic_management;
 
+-- 使用数据库
 USE academic_management;
 
+-- 创建用户表
 CREATE TABLE users (
-    user_id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL,
-    password VARCHAR(50) NOT NULL,
-    user_type ENUM('student', 'teacher', 'admin') NOT NULL
+    user_id INT AUTO_INCREMENT PRIMARY KEY,          -- 用户ID，自动递增
+    username VARCHAR(50) NOT NULL,                   -- 用户名
+    password VARCHAR(50) NOT NULL,                   -- 密码
+    user_type ENUM('student', 'teacher', 'admin') NOT NULL  -- 用户类型：学生、教师或管理员
 );
 
+-- 创建学生表
 CREATE TABLE students (
-    student_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50),
-    grade INT,
-    major VARCHAR(100)
+    student_id INT AUTO_INCREMENT PRIMARY KEY,       -- 学生ID，自动递增
+    name VARCHAR(50),                                -- 学生姓名
+    grade INT,                                       -- 年级
+    major VARCHAR(100)                               -- 专业
 );
 
+-- 创建教师表
 CREATE TABLE teachers (
-    teacher_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50),
-    title VARCHAR(50)
+    teacher_id INT AUTO_INCREMENT PRIMARY KEY,       -- 教师ID，自动递增
+    name VARCHAR(50),                                -- 教师姓名
+    title VARCHAR(50)                                -- 教师职称
 );
 
+-- 创建课程表
 CREATE TABLE courses (
-    course_id INT AUTO_INCREMENT PRIMARY KEY,
-    course_name VARCHAR(100),
-    credits INT,
-    teacher_id INT,
-    FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id)
+    course_id INT AUTO_INCREMENT PRIMARY KEY,        -- 课程ID，自动递增
+    course_name VARCHAR(100),                        -- 课程名称
+    credits INT,                                     -- 学分
+    teacher_id INT,                                  -- 任课教师ID，外键引用教师表
+    FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id) -- 设置外键，关联教师表
 );
 
+-- 创建成绩表
 CREATE TABLE scores (
-    student_id INT,
-    course_id INT,
-    score DECIMAL(5, 2),
-    PRIMARY KEY (student_id, course_id),
-    FOREIGN KEY (student_id) REFERENCES students(student_id),
-    FOREIGN KEY (course_id) REFERENCES courses(course_id)
+    student_id INT,                                  -- 学生ID，外键引用学生表
+    course_id INT,                                   -- 课程ID，外键引用课程表
+    score DECIMAL(5, 2),                             -- 成绩
+    PRIMARY KEY (student_id, course_id),             -- 联合主键，确保学生和课程的唯一性
+    FOREIGN KEY (student_id) REFERENCES students(student_id), -- 设置外键，关联学生表
+    FOREIGN KEY (course_id) REFERENCES courses(course_id)      -- 设置外键，关联课程表
 );
 
+-- 创建考试安排表
 CREATE TABLE exam_arrangements (
-    exam_id INT AUTO_INCREMENT PRIMARY KEY,
-    course_id INT,
-    exam_time DATETIME,
-    exam_location VARCHAR(100),
-    FOREIGN KEY (course_id) REFERENCES courses(course_id)
+    exam_id INT AUTO_INCREMENT PRIMARY KEY,          -- 考试ID，自动递增
+    course_id INT,                                   -- 课程ID，外键引用课程表
+    exam_time DATETIME,                              -- 考试时间
+    exam_location VARCHAR(100),                      -- 考试地点
+    FOREIGN KEY (course_id) REFERENCES courses(course_id)      -- 设置外键，关联课程表
 );
-```
 
+```
+### 数据库示例数据
+#### users 示例数据
+```
+| user_id | username | password | user_type | logged_in |
+|---------|----------|----------|-----------|-----------|
+| 1       | admin    | 123456   | admin     | 0         |
+| 2       | student  | 123456   | student   | 0         |
+
+```
+#### students 示例数据
+```
+| student_id | name      | grade | major         |
+|------------|-----------|-------|---------------|
+| 1          | 张三       | 3     | 计算机科学与技术 |
+| 2          | 李四       | 2     | 大数据技术与应用 |
+
+```
+#### teachers 示例数据
+```
+| teacher_id | name       | title        |
+|------------|------------|--------------|
+| 1          | 李明        | 教授          |
+| 2          | 刘刚        | 讲师          |
+
+```
+#### courses 示例数据
+```
+| course_id | course_name  | credits | teacher_id |
+|-----------|--------------|---------|------------|
+| 1         | 数据科学      | 4       | 1          |
+| 2         | 软件工程      | 3       | 2          |
+
+```
+#### scores 示例数据
+```
+| student_id | course_id | score |
+|------------|-----------|-------|
+| 1          | 1         | 85.50 |
+| 2          | 2         | 78.00 |
+
+```
+#### exam_arrangements 示例数据
+```
+| exam_id | course_id | exam_time         | exam_location |
+|---------|-----------|-------------------|---------------|
+| 1       | 1         | 2024-12-15 09:00  | 教8 101       |
+| 2       | 2         | 2024-12-18 13:00  | 教10 202      |
+```
 ## 系统功能
 
 ### 1. 登录与注册
@@ -149,5 +202,3 @@ CREATE TABLE exam_arrangements (
 
 - 管理课程、学生和教师信息。
 - 实现方式在 `academic_affairs_controller.py` 和 `course_model.py` 中定义。
-
-```
